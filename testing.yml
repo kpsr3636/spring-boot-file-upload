@@ -1,0 +1,31 @@
+name: Import Postman Collection
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  import-postman-collection:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+      
+    - name: Import Postman Collection to Postman
+      run: |
+        echo "Starting Import Process"
+        curl --location --request POST 'https://api.getpostman.com/import/run' \
+        --header 'X-Api-Key: ${{ secrets.POSTMAN_API_KEY }}' \
+        --header 'Content-Type: application/json' \
+        --data-raw '{
+            "input": {
+                "type": "file",
+                "content": "'$(base64 -w 0 path/to/your/postman_collection.json)'"
+            },
+            "workspace": "your-postman-workspace-id"
+        }'
+      env:
+        POSTMAN_API_KEY: ${{ secrets.POSTMAN_API_KEY }}
